@@ -329,6 +329,8 @@ class WhatsAppInstance {
             phone_connected: this.instance?.online,
             webhookUrl: this.instance.customWebhook,
             user: this.instance?.online ? this.instance.sock?.user : {},
+            chats: this.instance?.chats || [],
+            messages: this.instance?.messages || [],
         }
     }
 

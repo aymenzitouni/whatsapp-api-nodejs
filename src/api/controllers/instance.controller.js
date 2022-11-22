@@ -3,6 +3,21 @@ const fs = require('fs')
 const path = require('path')
 const config = require('../../config/config')
 const { Session } = require('../class/session')
+const { Client, LegacySessionAuth } = require('whatsapp-web.js')
+const qrcode = require('qrcode-terminal')
+const SESSION_FILE_PATH = './session.json'
+
+// Load the session data if it has been previously saved
+let sessionData
+if (fs.existsSync(SESSION_FILE_PATH)) {
+    sessionData = require(SESSION_FILE_PATH)
+}
+// Use the saved values
+const client = new Client({
+    authStrategy: new LegacySessionAuth({
+        session: sessionData,
+    }),
+})
 
 exports.init = async (req, res) => {
     const key = req.query.key
@@ -30,6 +45,7 @@ exports.init = async (req, res) => {
 exports.qr = async (req, res) => {
     try {
         const qrcode = await WhatsAppInstances[req.query.key]?.instance.qr
+
         res.render('qrcode', {
             qrcode: qrcode,
         })
@@ -57,6 +73,12 @@ exports.qrbase64 = async (req, res) => {
 
 exports.info = async (req, res) => {
     const instance = WhatsAppInstances[req.query.key]
+    console.log('@key', WhatsAppInstances[req.query.key]?.instance.key)
+    console.log('@chats', WhatsAppInstances[req.query.key]?.instance.chats)
+    console.log(
+        '@messages',
+        WhatsAppInstances[req.query.key]?.instance.messages
+    )
     let data
     try {
         data = await instance.getInstanceDetail(req.query.key)
